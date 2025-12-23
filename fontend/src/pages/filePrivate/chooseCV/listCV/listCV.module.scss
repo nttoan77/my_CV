@@ -1,0 +1,286 @@
+// ====================== MAIN CONTENT ======================
+.main-content {
+    padding: 40px 20px;
+    max-width: 1280px;
+    margin: 0 auto;
+    min-height: 70vh;
+  }
+  
+  .title {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 40px;
+  
+    @media (max-width: 768px) {
+      font-size: 26px;
+    }
+  }
+  
+  // ====================== EMPTY STATE ======================
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: #555;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .empty-illustration {
+    font-size: 120px;
+    margin-bottom: 32px;
+    opacity: 0.7;
+  }
+  
+  .empty-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 16px;
+  }
+  
+  .empty-description {
+    font-size: 17px;
+    line-height: 1.6;
+    color: #666;
+    margin-bottom: 40px;
+  }
+  
+  .create-first-cv-btn {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    padding: 16px 36px;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+    transition: all 0.3s ease;
+  
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 123, 255, 0.4);
+    }
+  
+    &:active {
+      transform: translateY(0);
+    }
+  
+    svg {
+      margin-right: 10px;
+    }
+  }
+  
+  // ====================== CV GRID ======================
+  .cv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 32px;
+    margin-top: 20px;
+  
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+  }
+  
+  // ====================== CV CARD COMMON ======================
+  .cv-card {
+    border-radius: 20px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    height: fit-content;
+  
+    &:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+  }
+  
+  // Card "Tạo CV mới"
+  .create-new {
+    border: 3px dashed #bbd1f0;
+    background: linear-gradient(135deg, #f8fbff, #f0f7ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+  
+    &:hover {
+      border-color: #007bff;
+      background: linear-gradient(135deg, #f0f7ff, #e6f2ff);
+    }
+  }
+  
+  .create-new-inner {
+    text-align: center;
+    color: #2c3e50;
+  }
+  
+  .plus-icon-large {
+    font-size: 70px;
+    color: #007bff;
+    margin-bottom: 24px;
+    transition: transform 0.3s;
+  
+    .create-new:hover & {
+      transform: scale(1.15);
+    }
+  }
+  
+  .create-new-inner h3 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  
+  .create-new-inner p {
+    font-size: 16px;
+    color: #666;
+  }
+  
+  // Card CV thật
+  .cv-item {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .cv-preview {
+    height: 260px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  
+    .preview-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+  
+      .cv-item:hover & {
+        transform: scale(1.08);
+      }
+    }
+  
+    .preview-placeholder {
+      font-size: 60px;
+      font-weight: bold;
+      color: #e0e0e0;
+      user-select: none;
+    }
+  }
+  
+  .cv-info {
+    padding: 24px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+
+  }
+  
+  .cv-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 12px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .cv-position {
+    display: flex;
+    align-items: center;
+    color: #007bff;
+    font-size: 16px;
+    margin: 8px 0 16px;
+    font-weight: 500;
+  
+    svg {
+      margin-right: 8px;
+      font-size: 18px;
+    }
+  }
+  
+  .cv-footer {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+  }
+  
+  .updated-at {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #000;
+    margin-left: 20px;
+  
+    svg {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+  }
+
+  .cv-preview {
+    height: 300px; /* Tăng lên để overlay rõ hơn */
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px 16px 0 0; /* Bo góc trên card */
+  
+    .preview-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: transform 0.6s ease;
+  
+      .cv-item:hover & {
+        transform: scale(1.12);
+      }
+    }
+  }
+  
+  .preview-overlay {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    // background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+    background-color: rgb(244, 235, 235, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    border-radius: 30px;
+    padding: 10px;
+    color: #000;
+    text-align: left;
+    pointer-events: none; /* Không chắn click card */
+  }
+  
+  .overlay-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-left: 20px;
+    line-height: 1.2;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8); /* Làm chữ nổi hẳn */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .overlay-position {
+    font-size: 16px;
+    opacity: 0.95;
+    margin: 0;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+  }
