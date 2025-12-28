@@ -7,30 +7,67 @@ dotenv.config();
 // 🧩 Xác thực token
 export default async function authMiddleware(req, res, next) {
   try {
+    // ================= LOG CƠ BẢN =================
+    // console.log(`🔐 [AUTH] ${req.method} ${req.originalUrl}`);
+
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Bạn chưa đăng nhập" });
+    // ================= CHECK HEADER =================
+    if (!authHeader) {
+      // console.log("⛔ [AUTH] Thiếu Authorization header");
+      return res.status(401).json({
+        success: false,
+        message: "Bạn chưa đăng nhập",
+      });
+    }
+
+    if (!authHeader.startsWith("Bearer ")) {
+      // console.log("⛔ [AUTH] Sai định dạng Authorization header");
+      return res.status(401).json({
+        success: false,
+        message: "Token không đúng định dạng",
+      });
     }
 
     const token = authHeader.split(" ")[1];
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secretkey");
+    // console.log("🔑 [AUTH] Token:", token.slice(0, 12) + "...");
 
-    // 🔥 QUAN TRỌNG: LẤY USER THẬT TỪ DB
+    // ================= VERIFY TOKEN =================
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET || "secretkey");
+    } catch (err) {
+      // console.log("⛔ [AUTH] Token không hợp lệ / hết hạn");
+      return res.status(401).json({
+        success: false,
+        message: "Token không hợp lệ hoặc đã hết hạn",
+      });
+    }
+
+    // ================= GET USER =================
     const user = await User.findById(decoded.id).select("-password");
 
     if (!user) {
-      return res.status(401).json({ message: "Người dùng không tồn tại" });
+      // console.log("⛔ [AUTH] User không tồn tại:", decoded.id);
+      return res.status(401).json({
+        success: false,
+        message: "Người dùng không tồn tại",
+      });
     }
 
-    // 🔥 GÁN USER ĐẦY ĐỦ
+    // ================= ATTACH USER =================
     req.user = user;
+
+    // console.log("✅ [AUTH] Xác thực thành công | User:", user._id.toString());
 
     next();
   } catch (error) {
-    console.error("❌ Lỗi authMiddleware:", error);
-    return res.status(401).json({ message: "Token không hợp lệ hoặc hết hạn" });
+    console.error("🔥 [AUTH] Lỗi không mong muốn:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi xác thực",
+    });
   }
 }
 

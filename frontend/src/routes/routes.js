@@ -31,6 +31,7 @@ const privateRoutes = [
     { path: config.routes.RegisInformationUser, component: RegisInformationUser, layout: null },
     { path: config.routes.Admin, component: Admin, layout: null },
     { path: config.routes.cv, component: CV },
+    // { path: config.routes.cvDetail, component: CV },
 ];
 
 export { publicRoutes, privateRoutes };

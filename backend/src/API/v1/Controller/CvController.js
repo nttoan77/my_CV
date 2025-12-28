@@ -7,12 +7,128 @@ import { deleteFile } from "../../../util/fileHelper.js"; // nếu bạn có xó
 
 class CvController {
   // Tạo CV mới
-  static async createCV(req, res) {
-    // console.log("CREATE CV ĐƯỢC GỌI");
-    // console.log("User ID từ token:", req.user._id);
-    // console.log("Full req.body:", req.body);
-    // console.log("req.files:", req.files);
+  // static async createCV(req, res) {
+  //   // console.log("CREATE CV ĐƯỢC GỌI");
+  //   // console.log("User ID từ token:", req.user._id);
+  //   // console.log("Full req.body:", req.body);
+  //   // console.log("req.files:", req.files);
 
+  //   try {
+  //     const userId = req.user._id;
+
+  //     // ==================== VALIDATE ====================
+  //     if (!req.body.title?.trim()) {
+  //       return res.status(400).json({
+  //         success: false,
+  //         message: "Tiêu đề CV là bắt buộc",
+  //       });
+  //     }
+
+  //     // ==================== BUILD DATA ====================
+  //     const cvData = {
+  //       user: userId,
+  //       title: req.body.title.trim(),
+  //       jobPosition: req.body.jobPosition?.trim() || "",
+  //       nameCV: req.body.nameCV?.trim() || "",
+  //       careerField: req.body.careerField?.trim() || "",
+  //       careerGoal: req.body.careerGoal?.trim() || "",
+  //       about: req.body.about?.trim() || "",
+  //       website: req.body.website?.trim() || "",
+  //       workExperiences: [],
+  //       education: [],
+  //       skills: [],
+  //       certificates: [],
+  //       attachments: [],
+  //       exportedFiles: [],
+  //     };
+
+  //     // ==================== PARSE JSON ====================
+  //     try {
+  //       if (req.body.workExperiences) {
+  //         cvData.workExperiences = JSON.parse(req.body.workExperiences);
+  //       }
+  //       if (req.body.education) {
+  //         cvData.education = JSON.parse(req.body.education);
+  //       }
+  //       if (req.body.skills) {
+  //         cvData.skills = JSON.parse(req.body.skills);
+  //       }
+  //       if (req.body.certificates) {
+  //         cvData.certificates = JSON.parse(req.body.certificates);
+  //       }
+  //     } catch (err) {
+  //       return res.status(400).json({
+  //         success: false,
+  //         message: "Dữ liệu JSON không hợp lệ",
+  //       });
+  //     }
+
+  //     // =====================================================
+  //     // 🔥🔥🔥 LOGIC QUAN TRỌNG NHẤT: MAP FILE → CERTIFICATES
+  //     // =====================================================
+  //     if (req.files?.certificateFiles?.length) {
+  //       req.files.certificateFiles.forEach((file, index) => {
+  //         if (cvData.certificates[index]) {
+  //           cvData.certificates[index].file = {
+  //             filename: file.filename, // 🔧 FIX
+  //             path: file.path.replace(/\\/g, "/"), // 🔧 FIX
+  //             mimetype: file.mimetype,
+  //             size: file.size,
+  //           };
+  //         }
+  //       });
+  //     }
+
+  //     // =====================================================
+  //     // ❌ KHÔNG DÙNG attachments cho certificates nữa
+  //     // (Nếu sau này có file khác thì xử lý riêng)
+  //     // =====================================================
+
+  //     // ==================== SET DEFAULT CV ====================
+  //     const cvCount = await CV.countDocuments({ user: userId });
+  //     if (cvCount === 0) {
+  //       cvData.isDefault = true;
+  //     }
+
+  //     // ==================== SAVE CV ====================
+  //     const newCV = new CV(cvData);
+  //     await newCV.save();
+  //     console.log("✅ CV mới được tạo với ID:", newCV._id.toString());
+
+  //     // ==================== UPDATE USER ====================
+  //     await User.findByIdAndUpdate(
+  //       userId,
+  //       {
+  //         $push: {
+  //           cvs: {
+  //             cv: newCV._id,
+  //             title: newCV.title,
+  //             isDefault: newCV.isDefault,
+  //             updatedAt: newCV.updatedAt,
+  //           },
+  //         },
+  //         ...(newCV.isDefault && { defaultCV: newCV._id }),
+  //       },
+  //       { new: true }
+  //     );
+
+  //     // ==================== RESPONSE ====================
+  //     return res.status(201).json({
+  //       success: true,
+  //       message: "Tạo CV thành công!",
+  //       data: newCV,
+  //     });
+  //   } catch (error) {
+  //     // console.error("LỖI createCV:", error);
+  //     return res.status(500).json({
+  //       success: false,
+  //       message: "Lỗi tạo CV",
+  //       error: error.message,
+  //     });
+  //   }
+  // }
+
+  static async createCV(req, res) {
     try {
       const userId = req.user._id;
 
@@ -70,19 +186,14 @@ class CvController {
         req.files.certificateFiles.forEach((file, index) => {
           if (cvData.certificates[index]) {
             cvData.certificates[index].file = {
-              filename: file.filename, // 🔧 FIX
-              path: file.path.replace(/\\/g, "/"), // 🔧 FIX
+              filename: file.filename,
+              path: file.path.replace(/\\/g, "/"),
               mimetype: file.mimetype,
               size: file.size,
             };
           }
         });
       }
-
-      // =====================================================
-      // ❌ KHÔNG DÙNG attachments cho certificates nữa
-      // (Nếu sau này có file khác thì xử lý riêng)
-      // =====================================================
 
       // ==================== SET DEFAULT CV ====================
       const cvCount = await CV.countDocuments({ user: userId });
@@ -94,22 +205,29 @@ class CvController {
       const newCV = new CV(cvData);
       await newCV.save();
 
+      console.log("✅ CV mới được tạo với ID:", newCV._id.toString()); // ← SỬA TẠI ĐÂY: Thêm log để dễ debug ID
+
       // ==================== UPDATE USER ====================
-      await User.findByIdAndUpdate(
-        userId,
-        {
-          $push: {
-            cvs: {
-              cv: newCV._id,
-              title: newCV.title,
-              isDefault: newCV.isDefault,
-              updatedAt: newCV.updatedAt,
-            },
+      // ← SỬA TẠI ĐÂY: Tách riêng để rõ ràng và tránh lỗi spread operator
+      const updateUserQuery = {
+        $push: {
+          cvs: {
+            cvId: newCV._id, // Đảm bảo push đúng _id của CV mới
+            title: newCV.title,
+            isDefault: newCV.isDefault,
+            updatedAt: newCV.updatedAt || new Date(),
           },
-          ...(newCV.isDefault && { defaultCV: newCV._id }),
         },
-        { new: true }
-      );
+      };
+
+      // Chỉ set defaultCV nếu CV này là mặc định
+      if (newCV.isDefault) {
+        updateUserQuery.$set = { defaultCV: newCV._id }; // ← SỬA TẠI ĐÂY: Set defaultCV rõ ràng
+      }
+
+      await User.findByIdAndUpdate(userId, updateUserQuery, { new: true });
+
+      // console.log("✅ Đã cập nhật User.cvs và defaultCV (nếu có) thành công"); // ← SỬA TẠI ĐÂY: Log xác nhận đồng bộ
 
       // ==================== RESPONSE ====================
       return res.status(201).json({
@@ -118,7 +236,7 @@ class CvController {
         data: newCV,
       });
     } catch (error) {
-      // console.error("LỖI createCV:", error);
+      // console.error("LỖI createCV:", error); // ← Thêm log lỗi chi tiết hơn
       return res.status(500).json({
         success: false,
         message: "Lỗi tạo CV",
@@ -127,8 +245,8 @@ class CvController {
     }
   }
 
-   // Lấy CV mặc định
-   static async getDefaultCV(req, res) {
+  // Lấy CV mặc định
+  static async getDefaultCV(req, res) {
     try {
       const cv = await CV.findOne({
         user: req.user._id,
@@ -144,7 +262,6 @@ class CvController {
       return res.status(500).json({ success: false, message: "Lỗi server" });
     }
   }
-
 
   // Lấy danh sách CV của mình
   static async getMyCVs(req, res) {
@@ -165,56 +282,32 @@ class CvController {
     }
   }
 
- 
   // Lấy CV theo ID
   static async getCVById(req, res) {
     try {
-      const { id } = req.params;
-
-      console.log("➡️ CV ID từ params:", id);
-      console.log("➡️ User ID từ token:", req.user._id);
-
-      // ✅ CHẶN ID NULL / UNDEFINED
-      if (!id || id === "null" || id === "undefined") {
-        return res.status(400).json({
-          success: false,
-          message: "CV ID không hợp lệ",
-        });
-      }
-
-      // ✅ CHẶN ID SAI FORMAT ObjectId
-      if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({
-          success: false,
-          message: "CV ID không đúng định dạng ObjectId",
-        });
-      }
+      // console.log("🔍 Đang tìm CV với ID:", req.params.id);
+      // console.log("👤 User ID từ token:", req.user._id);
 
       const cv = await CV.findOne({
-        _id: id,
+        _id: req.params.id,
         user: req.user._id,
       }).lean();
 
       if (!cv) {
+        // console.log("❌ Không tìm thấy CV hoặc không có quyền");
         return res.status(404).json({
           success: false,
-          message: "Không tìm thấy CV",
+          message: "CV không tồn tại hoặc bạn không có quyền truy cập",
         });
       }
 
-      return res.json({
-        success: true,
-        data: cv,
-      });
+      // console.log("✅ Tìm thấy CV:", cv.title); // hoặc cv._id
+      return res.json({ success: true, data: cv });
     } catch (error) {
-      console.error("🔥 LỖI getCVById:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Lỗi server",
-      });
+      console.error("🔥 Lỗi getCVById:", error);
+      return res.status(500).json({ success: false, message: "Lỗi server" });
     }
   }
-
   // Cập nhật CV
   static async updateCV(req, res) {
     try {

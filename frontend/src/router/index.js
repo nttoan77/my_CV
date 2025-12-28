@@ -94,9 +94,9 @@ export const appRoutes = [
     >
         {/* Trang chủ */}
         {privateRoutes
-            .filter((r) => r.path === config.home)
+            .filter((r) => r.path === config.routes.cv)
             .map((route) => (
-                <Route key="home" index element={<RenderRoute route={route} />} />
+                <Route key={route.path} path={route.path} element={<RenderRoute route={route} />} />
             ))}
 
         {/* Các trang khác */}

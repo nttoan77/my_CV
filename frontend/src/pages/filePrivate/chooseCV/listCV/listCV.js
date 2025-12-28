@@ -55,7 +55,7 @@ const CVList = ({ cvList, onCreateNew, onSelectCV }) => {
 
                     {/* DANH SÁCH CV HIỆN CÓ */}
                     {cvList.map((cv) => (
-                        <div key={cv._id} className={cx('cv-card', 'cv-item')} onClick={() => onSelectCV(cv._id)}>
+                        <div key={cv.cvId || cv._id} className={cx('cv-card', 'cv-item')} onClick={() => onSelectCV(cv)}>
                             <div className={cx('cv-preview')}>
                                 <img
                                     src={cv.previewUrl || getRandomPlaceholder()}
@@ -63,33 +63,20 @@ const CVList = ({ cvList, onCreateNew, onSelectCV }) => {
                                     className={cx('preview-img')}
                                 />
 
-                                {/* OVERLAY TIÊU ĐỀ NỔI BẬT - CHỈ HIỆN KHI CHƯA CÓ PREVIEW THẬT HOẶC LUÔN HIỆN ĐỂ ĐẸP */}
                                 <div className={cx('preview-overlay')}>
                                     <h3 className={cx('overlay-title')}>{cv.title || 'CV chưa có tiêu đề'}</h3>
-                                    {cv.position && <p className={cx('overlay-position')}>{cv.position}</p>}
+
+                                    {/* ← SỬA TẠI ĐÂY: Comment lại vì User.cvs không có jobPosition */}
+                                    {/* {cv.jobPosition && <p className={cx('overlay-position')}>{cv.jobPosition}</p>} */}
+
                                     <div className={cx('cv-footer')}>
-                                    <span className={cx('updated-at')}>
-                                        <FontAwesomeIcon icon={faClock} />
-                                        {new Date(cv.updatedAt).toLocaleDateString('vi-VN')}
-                                    </span>
-                                </div>
+                                        <span className={cx('updated-at')}>
+                                            <FontAwesomeIcon icon={faClock} />
+                                            {new Date(cv.updatedAt).toLocaleDateString('vi-VN')}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-
-                            {/* <div className={cx('cv-info')}>
-                                <h3 className={cx('cv-title')}>{cv.title || 'CV không có tiêu đề'}</h3>
-                                {cv.position && (
-                                    <p className={cx('cv-position')}>
-                                        <FontAwesomeIcon icon={faBriefcase} /> {cv.position}
-                                    </p>
-                                )}
-                                <div className={cx('cv-footer')}>
-                                    <span className={cx('updated-at')}>
-                                        <FontAwesomeIcon icon={faClock} />
-                                        {new Date(cv.updatedAt).toLocaleDateString('vi-VN')}
-                                    </span>
-                                </div>
-                            </div> */}
                         </div>
                     ))}
                 </div>

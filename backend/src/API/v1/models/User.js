@@ -56,11 +56,11 @@ const userSchema = new mongoose.Schema({
   lastLoginAt: Date,
   cvs: [
     {
-      cv: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "CV",
-        required: true,
-      },
+      // cv: {
+      //   type: mongoose.Schema.Types.ObjectId,
+      //   ref: "CV",
+      //   required: true,
+      // },
       title: {
         type: String, // 👉 TÊN CV HIỂN THỊ
         required: true,
@@ -73,6 +73,11 @@ const userSchema = new mongoose.Schema({
       updatedAt: {
         type: Date,
         default: Date.now,
+      },
+      cvId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CV",
+        required: true,
       },
     },
   ],

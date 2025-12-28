@@ -1,7 +1,8 @@
 
 
 const routes = {
-    cv: '/cv',
+    cv: '/cv/:id',
+    // cvDetail: '/cv/:id',
     Login: '/login',
     Register: '/register',
     RegisterInform:'/register-Inform',

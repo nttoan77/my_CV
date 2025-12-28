@@ -10,7 +10,13 @@ const router = express.Router();
 
 /* =====================================================
    1️⃣ CẤU HÌNH UPLOAD FILE (TÁCH RÕ – DỄ BẢO TRÌ)
+  
+
 ===================================================== */
+router.use((req, res, next) => {
+  console.log(`🧭 [CV ROUTER] ${req.method} ${req.originalUrl}`);
+  next();
+});
 
 // ✅ [SỬA] chuẩn hoá đường dẫn upload
 const uploadDir = path.join(process.cwd(), "public/uploads/cv");
