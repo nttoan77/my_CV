@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import classNames from 'classnames/bind';
 import style from './CV.module.scss';
 
-import Introduce from '../../pagesComponent/Introduce/Introduce';
 import AboutMe from '../../pagesComponent/AboutMe/AboutMe';
 import Education from '../../pagesComponent/Education/Education';
 import Experience from '../../pagesComponent/Experience/Experience';
 import ProfessionalSkill from '../../pagesComponent/ProfessionalSkill/ProfessionalSkill';
 import ScrollToTopButton from '~/components/ScrollToTopButton/ScrollToTopButton';
+import SlideEducation from '~/pages/pagesComponent/Education/slideEducation/slideEducation';
 
 import httpRequest from '~/utils/httpRequest';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -15,79 +15,108 @@ import { useNavigate, useParams } from 'react-router-dom';
 const cx = classNames.bind(style);
 
 function CV({ refs = {} }) {
-  const { id: urlId } = useParams(); // ID từ URL (ví dụ: /cv/123...)
+  const { id: urlId } = useParams();
   const navigate = useNavigate();
+
   const [cvData, setCvData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Ưu tiên lấy ID đã lưu trong localStorage (từ ChooseCV)
-    let selectedCVId = localStorage.getItem('selectedCV');
+  // 🔒 CHẶN FETCH LẶP (React 18 StrictMode)
+  const hasFetched = useRef(false);
 
-    // Nếu không có trong localStorage → dùng ID từ URL
+  useEffect(() => {
+    // console.group('🧭 [CV] useEffect START');
+
+    // console.log('🔹 urlId:', urlId);
+    let selectedCVId = localStorage.getItem('selectedCV');
+    // console.log('🔹 selectedCVId (localStorage):', selectedCVId);
+
+    // Ưu tiên ID trên URL
     if (!selectedCVId && urlId && urlId.length === 24) {
       selectedCVId = urlId;
+      // console.log('➡️ Lấy CV ID từ URL:', selectedCVId);
     }
 
-    // Nếu vẫn không có ID hợp lệ → redirect về chọn CV
+    // ❌ ID không hợp lệ
     if (!selectedCVId || selectedCVId.length !== 24) {
-      console.warn('❌ Không có CV ID hợp lệ:', selectedCVId, 'URL ID:', urlId);
+      // console.warn('❌ Không có CV ID hợp lệ → redirect /choose-cv');
+      // console.groupEnd();
       navigate('/choose-cv');
       return;
     }
 
-    console.log('✅ Đang fetch CV với ID:', selectedCVId);
+    // ⛔ React StrictMode gọi effect 2 lần (DEV)
+    if (hasFetched.current) {
+      // console.log('⛔ [DEV] Skip fetch CV (StrictMode)');
+      // console.groupEnd();
+      return;
+    }
+
+    hasFetched.current = true;
+    // console.log('✅ Bắt đầu fetch CV với ID:', selectedCVId);
 
     const fetchCV = async () => {
+      // console.time('⏱ Fetch CV time');
       try {
         const res = await httpRequest.get(`/api/cv/${selectedCVId}`);
-        setCvData(res.data?.data);
-      } catch (err) {
-        console.error('Lỗi khi fetch CV:', err.response?.status, err.message);
 
-        if (err.response?.status === 404) {
-          console.warn('⚠️ CV không tồn tại hoặc không có quyền');
+        // console.log('📦 API response:', res);
+        const data = res.data?.data || res.data;
+
+        // console.log('✅ CV DATA nhận được:', data);
+        setCvData(data);
+      } catch (err) {
+        // console.error('🔥 Lỗi fetch CV:', err);
+
+        if (err.response) {
+          // console.error('📛 Status:', err.response.status);
+          // console.error('📛 Data:', err.response.data);
         }
-        // Không thử fallback nữa vì giờ ID đã đồng nhất
+
         navigate('/choose-cv');
       } finally {
         setLoading(false);
+        // console.timeEnd('⏱ Fetch CV time');
+        // console.groupEnd();
       }
     };
 
     fetchCV();
-  }, [urlId, navigate]); // Theo dõi urlId để reload khi đổi route
+  }, [urlId, navigate]);
+
+  /* ================= RENDER DEBUG ================= */
+  // console.log('🔄 Render CV component');
+  // console.log('📊 loading:', loading);
+  // console.log('📄 cvData:', cvData);
 
   if (loading) {
-    return (
-      <div className={cx('loading')}>
-        <p>Đang tải hồ sơ CV...</p>
-      </div>
-    );
+    return <div className={cx('loading')}>Đang tải CV...</div>;
   }
 
   if (!cvData) {
-    return (
-      <div className={cx('loading')}>
-        <p>Không tìm thấy dữ liệu CV</p>
-      </div>
-    );
+    return <div className={cx('loading')}>Không có dữ liệu CV</div>;
   }
 
-  const { nameCV, jobPosition, about, education, workExperiences, skills } = cvData;
+  const {
+    education = [],
+    workExperiences = [],
+    skills = [],
+  } = cvData;
+
+  // console.log('🎓 education:', education);
+  // console.log('💼 workExperiences:', workExperiences);
+  // console.log('🛠 skills:', skills);
 
   return (
     <div className={cx('wrapper')}>
-      <section ref={refs.IntroduceRef} className={cx('item')}>
-        <Introduce data={{ nameCV, jobPosition }} />
+      <section ref={refs.AboutMeRef} className={cx('item')}>
+        <AboutMe data={cvData} />
       </section>
 
-      <section ref={refs.AboutMeRef} className={cx('item')}>
-        <AboutMe data={about} />
-      </section>
 
       <section ref={refs.EducationRef} className={cx('item')}>
         <Education data={education} />
+        <SlideEducation data={cvData} />
       </section>
 
       <section ref={refs.ExperienceProjectsRef} className={cx('item')}>

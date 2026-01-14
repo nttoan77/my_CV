@@ -1,121 +1,162 @@
-import classNames from "classnames/bind";
-import styles from "./slideEducation.module.scss";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectCoverflow, Pagination, Navigation, Autoplay } from "swiper/modules";
+// src/pages/pagesComponent/Education/slideEducation/slideEducation.jsx
+import { useState, useMemo } from 'react';
+import classNames from 'classnames/bind';
+import styles from './slideEducation.module.scss';
 
-import "swiper/css";
-import "swiper/css/effect-coverflow";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectCoverflow, Pagination, Navigation, Autoplay } from 'swiper/modules';
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleArrowLeft, faCircleArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
+import { motion } from 'framer-motion';
+
+import 'swiper/css';
+import 'swiper/css/effect-coverflow';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleArrowLeft, faCircleArrowRight, faImage } from '@fortawesome/free-solid-svg-icons';
 
 const cx = classNames.bind(styles);
 
-function SlideEducation() {
-  const [dataUser, setDataUser] = useState(null);
-  const [certificates, setCertificates] = useState([]);
+/* ================= Skeleton ================= */
+function SlideSkeleton() {
+    return (
+        <div className={cx('skeleton-wrapper')}>
+            {[1, 2, 3].map((i) => (
+                <div key={i} className={cx('skeleton-card')} />
+            ))}
+        </div>
+    );
+}
 
-  // === LẤY DỮ LIỆU USER TỪ API ===
-  useEffect(() => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
-      console.warn("⚠️ Không tìm thấy userId trong localStorage.");
-      return;
+function SlideEducation({ data }) {
+    const [activeImage, setActiveImage] = useState(null);
+    /* ============ Normalize Images ============ */
+    const certificateImages = useMemo(() => {
+        return data.certificates
+            .filter((cert) => cert.file?.mimetype?.startsWith('image/') && cert.file?.path)
+            .map((cert) => {
+                let url = cert.file.path.replace(/\\/g, '/');
+
+                if (url.includes('public')) {
+                    url = url.split('public')[1];
+                }
+
+                if (!url.startsWith('http')) {
+                    url = `${process.env.REACT_APP_BASE_URL}/${url.replace(/^\//, '')}`;
+                }
+
+                return {
+                    url,
+                   
+                };
+            });
+    }, [data]);
+
+    /* ============ Loading ============ */
+    if (!data) {
+        return (
+            <div className={cx('wrapper')}>
+                <SlideSkeleton />
+            </div>
+        );
     }
 
-    const FetchUser = async () => {
-      try {
-        const res = await fetch(`${process.env.REACT_APP_BASE_URL}/api/auth/${userId}`);
-        const data = await res.json();
+    /* ============ Empty ============ */
+    if (!data.certificates || data.certificates.length === 0) {
+        return (
+            <div className={cx('wrapper')}>
+                <div className={cx('empty-state')}>
+                    <FontAwesomeIcon icon={faImage} size="4x" />
+                    <h3>Chưa có chứng chỉ hình ảnh</h3>
+                    <p>Hãy tải lên chứng chỉ dạng JPG / PNG.</p>
+                </div>
+            </div>
+        );
+    }
 
-        if (!res.ok) {
-          console.error("❌ Lỗi lấy user:", data?.message);
-          return;
-        }
+    if (certificateImages.length === 0) {
+        return (
+            <div className={cx('wrapper')}>
+                <div className={cx('empty-state')}>
+                    <FontAwesomeIcon icon={faImage} size="4x" />
+                    <h3>Không có ảnh hợp lệ</h3>
+                </div>
+            </div>
+        );
+    }
 
-        setDataUser(data);
+    return (
+        <>
+            {/* ===== Animate when scroll into view ===== */}
+            <motion.div
+                className={cx('wrapper')}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
+            >
+                <div className={cx('container')}>
+                    <div className={cx("swiper-button-prev-custom swiper-button-prev", "btn")}>
+                        <FontAwesomeIcon icon={faCircleArrowLeft} />
+                    </div>
 
-        // === LẤY CERTIFICATE TRONG CV PROFILE ĐẦU TIÊN ===
-        const cv = data.cvProfiles?.[0];
+                    <Swiper
+                        effect="coverflow"
+                        centeredSlides
+                        grabCursor
+                        slidesPerView="auto"
+                        loop={certificateImages.length > 1}
+                        coverflowEffect={{
+                            rotate: 0,
+                            depth: 160,
+                            modifier: 2,
+                            slideShadows: false,
+                        }}
+                        pagination={{ clickable: true }}
+                        navigation={{
+                            nextEl: '.swiper-button-next-custom',
+                            prevEl: '.swiper-button-prev-custom',
+                        }}
+                        autoplay={certificateImages.length > 1 ? { delay: 3500, disableOnInteraction: false } : false}
+                        modules={[EffectCoverflow, Pagination, Navigation, Autoplay]}
+                        className={cx('swiper')}
+                        breakpoints={{
+                            320: { slidesPerView: 1 },
+                            768: { slidesPerView: 2 },
+                            1024: { slidesPerView: 3 },
+                        }}
+                    >
+                        {certificateImages.map((item, index) => (
+                            <SwiperSlide key={index} className={cx('slide')}>
+                                <motion.div
+                                    className={cx('slide-img')}
+                                    whileHover={{ scale: 1.03 }}
+                                    transition={{ duration: 0.3 }}
+                                    onClick={() => setActiveImage(item)}
+                                >
+                                    <img src={item.url} alt={item.name} className={cx('image')} loading="lazy" />
+                                    <div className={cx('caption')}>{item.name}</div>
+                                </motion.div>
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
 
-        if (cv?.certificate && Array.isArray(cv.certificate)) {
-          const images = cv.certificate
-            .filter(
-              (cert) =>
-                cert.file &&
-                cert.file.url &&
-                cert.file.mimetype &&
-                cert.file.mimetype.startsWith("image")
-            )
-            .map((cert) => cert.file.url);
+                    <div className={cx("swiper-button-next-custom swiper-button-next", "btn")}>
+                        <FontAwesomeIcon icon={faCircleArrowRight} />
+                    </div>
+                </div>
+            </motion.div>
 
-          setCertificates(images);
-        }
-      } catch (error) {
-        console.error("❌ Lỗi Fetch:", error);
-      }
-    };
-
-    FetchUser();
-  }, []);
-
-  if (!dataUser) return <div>Đang tải dữ liệu...</div>;
-  if (certificates.length === 0) return <div>Chưa có ảnh chứng chỉ nào để hiển thị.</div>;
-
-  return (
-    <div className={cx("wrapper")}>
-      <div className={cx("container")}>
-        {/* Nút điều hướng trái */}
-        <div className={cx("swiper-button-prev")}>
-          <FontAwesomeIcon icon={faCircleArrowLeft} />
-        </div>
-
-        {/* Swiper */}
-        <Swiper
-          effect="coverflow"
-          grabCursor
-          centeredSlides
-          loop
-          slidesPerView={3}
-          initialSlide={Math.floor(certificates.length / 2)}
-          coverflowEffect={{
-            rotate: 0,
-            stretch: 0,
-            depth: 100,
-            modifier: 2.5,
-            slideShadows: false,
-          }}
-          pagination={{ clickable: true }}
-          navigation={{
-            nextEl: `.${cx("swiper-button-next")}`,
-            prevEl: `.${cx("swiper-button-prev")}`,
-          }}
-          modules={[EffectCoverflow, Pagination, Navigation, Autoplay]}
-          autoplay={{
-            delay: 1500,
-            disableOnInteraction: false,
-          }}
-          className={cx("swiper")}
-        >
-          {certificates.map((src, index) => (
-            <SwiperSlide key={index} className={cx("slide")}>
-              <div className={cx("slide-img")}>
-                <img src={src} alt={`Chứng chỉ ${index + 1}`} className={cx("image")} />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-
-        {/* Nút điều hướng phải */}
-        <div className={cx("swiper-button-next")}>
-          <FontAwesomeIcon icon={faCircleArrowRight} />
-        </div>
-      </div>
-    </div>
-  );
+            {/* ===== Modal Zoom ===== */}
+            {activeImage && (
+                <div className={cx('modal')} onClick={() => setActiveImage(null)}>
+                    <img src={activeImage.url} alt={activeImage.name} />
+                    <span className={cx('modal-caption')}>{activeImage.name}</span>
+                </div>
+            )}
+        </>
+    );
 }
 
 export default SlideEducation;

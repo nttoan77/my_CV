@@ -1,5 +1,6 @@
 .form-container {
     margin: 20px 0;
+    width: 650px;
   }
   
   .file-input {
@@ -15,7 +16,7 @@
   
   .preview-item {
     position: relative;
-    width: 120px;
+    min-width: calc(25% - 10px);
     height: 100px;
     border: 1px solid #ddd;
     border-radius: 6px;

@@ -1,10 +1,11 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
-import multer from "multer";
+// import multer from "multer";
 
 import CvController from "../Controller/CvController.js";
 import protect from "../../v1/middleware/authMiddleware.js";
+import { uploadCVFiles } from "../../../middlewares/upload.js";
 
 const router = express.Router();
 
@@ -26,51 +27,51 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // ✅ [SỬA] cấu hình storage
-const storage = multer.diskStorage({
-  destination: (_, __, cb) => cb(null, uploadDir),
+// const storage = multer.diskStorage({
+//   destination: (_, __, cb) => cb(null, uploadDir),
 
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const uniqueName = `cv_${req.user._id}_${Date.now()}_${Math.round(
-      Math.random() * 1e9
-    )}${ext}`;
+//   filename: (req, file, cb) => {
+//     const ext = path.extname(file.originalname);
+//     const uniqueName = `cv_${req.user._id}_${Date.now()}_${Math.round(
+//       Math.random() * 1e9
+//     )}${ext}`;
 
-    cb(null, uniqueName);
-  },
-});
+//     cb(null, uniqueName);
+//   },
+// });
 
 // ✅ [SỬA] filter file rõ ràng
-const fileFilter = (req, file, cb) => {
-  const allowedMimeTypes = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/gif",
-    "image/webp",
-    "application/pdf",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  ];
+// const fileFilter = (req, file, cb) => {
+//   const allowedMimeTypes = [
+//     "image/jpeg",
+//     "image/jpg",
+//     "image/png",
+//     "image/gif",
+//     "image/webp",
+//     "application/pdf",
+//     "application/msword",
+//     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+//   ];
 
-  if (!allowedMimeTypes.includes(file.mimetype)) {
-    return cb(new Error("❌ File không hợp lệ"), false);
-  }
+//   if (!allowedMimeTypes.includes(file.mimetype)) {
+//     return cb(new Error("❌ File không hợp lệ"), false);
+//   }
 
-  cb(null, true);
-};
+//   cb(null, true);
+// };
 
 // ✅ [SỬA] upload middleware dùng chung
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
-});
+// const upload = multer({
+//   storage,
+//   fileFilter,
+//   limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+// });
 
-// ✅ [SỬA] tách middleware upload cho CV
-const uploadCVFiles = upload.fields([
-  { name: "certificateFiles", maxCount: 10 },
-  { name: "attachments", maxCount: 5 },
-]);
+// // ✅ [SỬA] tách middleware upload cho CV
+// const uploadCVFiles = upload.fields([
+//   { name: "certificateFiles", maxCount: 10 },
+//   { name: "attachments", maxCount: 5 },
+// ]);
 
 /* =====================================================
    2️⃣ ROUTES – TUÂN THỦ REST API (KHÔNG TRÙNG PATH)

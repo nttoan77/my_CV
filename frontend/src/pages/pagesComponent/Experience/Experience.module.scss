@@ -193,7 +193,7 @@
     }
   
     p {
-      font-size: 1rem;
+      font-size: 1.3rem;
       color: #555;
     }
   }
@@ -230,18 +230,18 @@
     }
   
     h4 {
-      font-size: 1.2rem;
+      font-size: 1.5rem;
       font-weight: 600;
       color: #002d6b;
     }
   
     .company {
-      font-size: 0.95rem;
+      font-size: 1.3rem;
       color: #666;
     }
   
     .time {
-      font-size: 0.9rem;
+      font-size: 1rem;
       color: #999;
     }
   }
@@ -265,12 +265,12 @@
       right: 20px;
       background: none;
       border: none;
-      font-size: 1.3rem;
-      color: #666;
+      font-size: 1.6rem;
+      color: #fa0202;
       cursor: pointer;
   
       &:hover {
-        color: #004aad;
+        color: #faa0a0;
       }
     }
   
@@ -278,19 +278,19 @@
       margin-top: 10px;
   
       h4 {
-        font-size: 1.3rem;
+        font-size: 1.6rem;
         color: #002d6b;
         font-weight: 600;
         margin-bottom: 4px;
       }
   
       .company {
-        font-size: 1rem;
+        font-size: 1.2rem;
         color: #666;
       }
   
       .time {
-        font-size: 0.9rem;
+        font-size: 1rem;
         color: #999;
         margin-bottom: 15px;
       }
@@ -299,7 +299,7 @@
         margin-top: 12px;
   
         h5 {
-          font-size: 1.05rem;
+          font-size: 1.45rem;
           font-weight: 600;
           color: #004aad;
           margin-bottom: 4px;
@@ -307,7 +307,7 @@
   
         p {
           color: #444;
-          font-size: 0.95rem;
+          font-size: 1.3rem;
           line-height: 1.5;
         }
       }
@@ -318,7 +318,7 @@
   .empty {
     text-align: center;
     color: #777;
-    font-size: 1rem;
+    font-size: 1.2rem;
   }
   
   /* --- Animations --- */
@@ -351,11 +351,11 @@
     }
   
     .summary h4 {
-      font-size: 1.1rem;
+      font-size: 1.3rem;
     }
   
     .detail-content h4 {
-      font-size: 1.1rem;
+      font-size: 1.3rem;
     }
   }
   

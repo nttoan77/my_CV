@@ -1,4 +1,4 @@
-// src/router/index.jsx – ĐÃ SỬA XONG, KHÔNG CÒN LỖI NỮA!
+// src/router/index.jsx
 import { Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '~/context/AuthContext';
 import { publicRoutes, privateRoutes } from '~/routes/routes';
@@ -7,7 +7,7 @@ import config from '~/config/routes';
 import DefaultLayout from '~/layouts/defaultLayout';
 import { Fragment } from 'react';
 
-// Guard components
+// ================= GUARDS =================
 const GuestOnly = () => {
     const { user } = useAuth();
     if (user) {
@@ -24,25 +24,19 @@ const Protected = ({ children }) => {
 
 const NeedProfile = () => {
     const { user } = useAuth();
-    const isComplete = user?.isProfileComplete === true; // chỉ true mới là hoàn thiện
-    console.log('NeedProfile → isComplete:', isComplete);
-    if (isComplete) {
-        return <Navigate to={config.ChooseCV} replace />;
-    }
+    const isComplete = user?.isProfileComplete === true;
+    if (isComplete) return <Navigate to={config.ChooseCV} replace />;
     return <Outlet />;
 };
 
-// Sửa HasProfile (quan trọng nhất!)
 const HasProfile = () => {
     const { user } = useAuth();
-    const isComplete = user?.isProfileComplete === true; // chỉ true mới cho vào
-    console.log('HasProfile → isComplete:', isComplete);
-    if (!isComplete) {
-        return <Navigate to={config.RegisInformationUser} replace />;
-    }
+    const isComplete = user?.isProfileComplete === true;
+    if (!isComplete) return <Navigate to={config.RegisInformationUser} replace />;
     return <Outlet />;
 };
 
+// ================= RENDER =================
 const RenderRoute = ({ route }) => {
     const Page = route.component;
     const Layout = route.layout === null ? Fragment : route.layout || DefaultLayout;
@@ -53,21 +47,21 @@ const RenderRoute = ({ route }) => {
     );
 };
 
-// ĐÚNG KIỂU: PHẢI LÀ ARRAY CỦA <Route> JSX, KHÔNG PHẢI <></>
+// ================= ROUTES =================
 export const appRoutes = [
-    // GUEST ROUTES
+    // ===== GUEST =====
     <Route key="guest" element={<GuestOnly />}>
         {publicRoutes.map((route) => (
             <Route
                 key={route.path}
-                index={route.path === '/'} // nếu có trang chủ trong public
+                index={route.path === '/'}
                 path={route.path}
                 element={<RenderRoute route={route} />}
             />
         ))}
     </Route>,
 
-    // ONBOARDING
+    // ===== ONBOARDING =====
     <Route
         key="onboarding"
         element={
@@ -83,7 +77,7 @@ export const appRoutes = [
             ))}
     </Route>,
 
-    // MAIN APP
+    // ===== MAIN APP =====
     <Route
         key="main"
         element={
@@ -92,21 +86,26 @@ export const appRoutes = [
             </Protected>
         }
     >
-        {/* Trang chủ */}
+        {/* CV – CHỈ RENDER 1 LẦN */}
         {privateRoutes
             .filter((r) => r.path === config.routes.cv)
             .map((route) => (
                 <Route key={route.path} path={route.path} element={<RenderRoute route={route} />} />
             ))}
 
-        {/* Các trang khác */}
+        {/* CÁC TRANG KHÁC (❗ LOẠI CV RA) */}
         {privateRoutes
-            .filter((r) => r.path !== config.RegisInformationUser && r.path !== config.home)
+            .filter(
+                (r) =>
+                    r.path !== config.RegisInformationUser &&
+                    // r.path !== config.home &&
+                    r.path !== config.routes.cv // 🔥 DÒNG QUYẾT ĐỊNH
+            )
             .map((route) => (
                 <Route key={route.path} path={route.path} element={<RenderRoute route={route} />} />
             ))}
     </Route>,
 
-    // 404
+    // ===== 404 =====
     <Route key="notfound" path="*" element={<Navigate to="/" replace />} />,
 ];

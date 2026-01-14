@@ -1,141 +1,12 @@
-// .study-container {
-//   width: 100%;
-//   max-width: 1000px;
-//   margin: 50px auto;
-//   padding: 20px;
-//   font-family: "Poppins", sans-serif;
-// }
+// Education.module.scss – Modern Minimal & Clean 2026 Style
 
-// .study-title {
-//   text-align: center;
-//   font-size: 2rem;
-//   font-weight: 700;
-//   color: #222;
-//   margin-bottom: 40px;
-//   position: relative;
+.wrapper {
+  padding: 100px 0 80px;
+  background: linear-gradient(to bottom, #f8f9ff 0%, #ffffff 100%);
 
-//   &::after {
-//     content: "";
-//     display: block;
-//     width: 80px;
-//     height: 4px;
-//     background: linear-gradient(90deg, #0061ff, #60efff);
-//     margin: 10px auto 0;
-//     border-radius: 4px;
-//   }
-// }
-
-// .study-empty {
-//   text-align: center;
-//   color: #666;
-//   font-size: 1.8rem;
-//   margin-top: 10px;
-// }
-
-// /* Premium Card */
-// .study-card {
-//   background: linear-gradient(145deg, #ffffff, #f3f5f7);
-//   border: 1px solid #e5e8ec;
-//   border-radius: 16px;
-//   padding: 25px 30px;
-//   margin-bottom: 25px;
-//   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
-//   transition: all 0.3s ease;
-
-//   &:hover {
-//     transform: translateY(-5px);
-//     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
-//     border-color: #cfd8e3;
-//   }
-// }
-
-// .study-header {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: flex-start;
-//   flex-wrap: wrap;
-// }
-
-// .study-school {
-//   font-size: 1.8rem;
-//   font-weight: 600;
-//   color: #0061ff;
-//   margin-bottom: 4px;
-// }
-
-// .study-degree {
-//   font-size: 1.6rem;
-//   color: #444;
-// }
-
-// .study-time {
-//   font-size: 1.4rem;
-//   color: #777;
-//   margin-top: 5px;
-//   white-space: nowrap;
-// }
-
-// .study-description {
-//   margin-top: 15px;
-//   font-size: 1.4rem;
-//   line-height: 1.6;
-//   color: #333;
-// }
-
-// .study-achievements {
-//   margin-top: 18px;
-//   background: #f9fbfc;
-//   padding: 12px 15px;
-//   border-radius: 10px;
-//   border-left: 4px solid #0061ff;
-
-//   h4 {
-//     font-size: 1rem;
-//     font-weight: 600;
-//     color: #222;
-//     margin-bottom: 6px;
-//   }
-
-//   ul {
-//     padding-left: 20px;
-//     margin: 0;
-
-//     li {
-//       font-size: 0.9rem;
-//       color: #555;
-//       margin-bottom: 5px;
-//       list-style-type: disc;
-//     }
-//   }
-// }
-
-// /* Responsive */
-// @media (max-width: 600px) {
-//   .study-card {
-//     padding: 20px;
-//   }
-
-//   .study-header {
-//     flex-direction: column;
-//     align-items: flex-start;
-//   }
-
-//   .study-time {
-//     margin-top: 5px;
-//   }
-// }
-
-
-// ===========================
-
-.study-container {
-  width: 100%;
-  max-width: 1000px;
-  margin: 40px auto;
-  padding: 20px;
-  transition: all 0.3s ease-in-out;
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(30px);
+  transition: all 1s ease;
 
   &.animate {
     opacity: 1;
@@ -143,102 +14,236 @@
   }
 }
 
-.study-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #222;
+.content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #1e293b;
   text-align: center;
-  margin-bottom: 25px;
-  border-bottom: 2px solid #3b82f6;
-  display: inline-block;
-  padding-bottom: 5px;
-}
-
-.study-list {
+  margin-bottom: 4rem;
   display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 
-.study-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 20px 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  svg {
+    color: var(--theme-color, #3b82f6);
+  }
 
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  @media (max-width: 768px) {
+    font-size: 2.4rem;
   }
 }
 
-.study-header {
+/* Danh sách học vấn - dọc trái */
+.education-list {
+  position: relative;
+  padding-left: 50px;
+}
+
+/* Mỗi item */
+.education-item {
+  position: relative;
+  margin-bottom: 3rem;
+  display: flex;
+  align-items: flex-start;
+
+  &:last-child .line {
+    display: none;
+  }
+}
+
+/* Điểm tròn + đường dọc */
+.marker {
+  position: absolute;
+  left: 0;
+  top: 28px;
+  width: 50px;
+  text-align: center;
+  z-index: 1;
+}
+
+.dot {
+  width: 20px;
+  height: 20px;
+  background: white;
+  border: 5px solid var(--theme-color, #3b82f6);
+  border-radius: 50%;
+  margin: 0 auto;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.line {
+  position: absolute;
+  left: 9px;
+  top: 48px;
+  width: 2px;
+  height: calc(100% + 20px);
+  background: #e2e8f0;
+  z-index: 0;
+}
+
+/* Card chính */
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  border: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: all 0.4s ease;
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+    border-color: var(--theme-color, #3b82f6);
+  }
+
+  &.expanded {
+    box-shadow: 0 20px 50px rgba(59, 130, 246, 0.12);
+    border-color: var(--theme-color, #3b82f6);
+  }
+}
+
+.header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 1rem;
 }
 
-.study-info {
+.header-left {
   flex: 1;
 }
 
-.study-school {
+.school {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+}
+
+.degree {
   font-size: 1.2rem;
+  color: var(--theme-color, #3b82f6);
   font-weight: 600;
-  color: #1e40af;
   margin: 0;
+
+  .field {
+    color: #475569;
+    font-weight: 500;
+  }
 }
 
-.study-degree {
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  color: #64748b;
   font-size: 1rem;
-  color: #444;
-  margin-top: 4px;
+  font-weight: 500;
 }
 
-.study-time {
-  font-size: 0.95rem;
-  color: #666;
-  background: #f1f5f9;
-  padding: 4px 10px;
-  border-radius: 8px;
+.chevron {
+  color: var(--theme-color, #3b82f6);
+  font-size: 1.1rem;
+  transition: transform 0.3s ease;
 }
 
-.study-description {
-  margin: 10px 0;
-  font-size: 0.95rem;
-  color: #333;
-  line-height: 1.6;
-}
+/* Chi tiết mở rộng */
+.details {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.6s ease, padding 0.5s ease, margin 0.5s ease;
 
-.study-achievements {
-  margin-top: 12px;
-
-  h4 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #1e3a8a;
-    margin-bottom: 6px;
-  }
-
-  ul {
-    margin-left: 18px;
-    list-style: disc;
-    color: #333;
-
-    li {
-      margin: 3px 0;
-      font-size: 0.95rem;
-    }
+  &.expanded {
+    max-height: 1000px;
+    margin-top: 1.8rem;
+    padding-top: 1.8rem;
+    border-top: 1px solid #e2e8f0;
   }
 }
 
-.study-empty {
+.description {
+  color: #475569;
+  line-height: 1.8;
+  font-size: 1.05rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+  align-items: flex-start;
+
+  svg {
+    color: var(--theme-color, #3b82f6);
+    font-size: 1.3rem;
+    margin-top: 0.3rem;
+    flex-shrink: 0;
+  }
+
+  strong {
+    color: #1e293b;
+    margin-right: 0.5rem;
+  }
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.tag {
+  background: #eff6ff;
+  color: #2563eb;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.achievements-list {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.5rem;
+  color: #475569;
+  line-height: 1.7;
+
+  li {
+    margin: 0.5rem 0;
+  }
+}
+
+/* No data */
+.noData {
   text-align: center;
-  color: #777;
-  font-style: italic;
-  margin-top: 20px;
+  padding: 5rem 2rem;
+  color: #94a3b8;
+
+  .noDataIcon {
+    font-size: 4.5rem;
+    color: #e2e8f0;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.4rem;
+    font-weight: 500;
+  }
+
+  span {
+    font-style: italic;
+    color: #64748b;
+  }
 }

@@ -1,13 +1,15 @@
 // CVList.jsx
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faBriefcase, faClock } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faBriefcase, faClock, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames/bind';
-import styles from './listCV.module.scss'; // Giữ chung file SCSS với ChooseCV
+import styles from './listCV.module.scss';
+
+import showDeleteConfirm from '~/components/DeleteConfirmModal/DeleteConfirmModal';
 
 const cx = classNames.bind(styles);
 
-const CVList = ({ cvList, onCreateNew, onSelectCV }) => {
+const CVList = ({ cvList, onCreateNew, onSelectCV, onDeleteCV }) => {
     // Danh sách 20+ ảnh mẫu CV đẹp từ các nguồn uy tín (mình đã chọn lọc những cái rõ nét, chuyên nghiệp)
     const PLACEHOLDER_IMAGES = [
         'https://img.tripi.vn/cdn-cgi/image/width=700,height=700/https://gcs.tripi.vn/public-tripi/tripi-feed/img/483329VcW/anh-mo-ta.png',
@@ -23,10 +25,25 @@ const CVList = ({ cvList, onCreateNew, onSelectCV }) => {
         // Thêm nữa nếu muốn, nhưng 20-30 là đủ để random đa dạng
     ];
 
-    // Hàm lấy ảnh random (mỗi lần gọi sẽ khác nhau)
+    // Hàm lấy ảnh random
     const getRandomPlaceholder = () => {
         const randomIndex = Math.floor(Math.random() * PLACEHOLDER_IMAGES.length);
         return PLACEHOLDER_IMAGES[randomIndex];
+    };
+    // hàm sử dụng để xóa
+    const handleDelete = (cvId, e) => {
+        e.stopPropagation(); // Ngăn click vào card (onSelectCV) khi bấm nút xóa
+        showDeleteConfirm({
+            title: 'Xóa CV này?',
+            text: 'Hành động này không thể hoàn tác. CV sẽ bị xóa vĩnh viễn!',
+            confirmButtonText: 'Xóa CV',
+            onConfirm: () => {
+                onDeleteCV(cvId); // Gọi hàm xóa từ component cha
+            },
+            onCancel: () => {
+                console.log('Đã hủy xóa CV');
+            },
+        });
     };
     return (
         <>
@@ -55,8 +72,19 @@ const CVList = ({ cvList, onCreateNew, onSelectCV }) => {
 
                     {/* DANH SÁCH CV HIỆN CÓ */}
                     {cvList.map((cv) => (
-                        <div key={cv.cvId || cv._id} className={cx('cv-card', 'cv-item')} onClick={() => onSelectCV(cv)}>
+                        <div
+                            key={cv.cvId || cv._id}
+                            className={cx('cv-card', 'cv-item')}
+                            onClick={() => onSelectCV(cv)}
+                        >
                             <div className={cx('cv-preview')}>
+                                <button
+                                    className={cx('btn-clear')}
+                                    onClick={(e) => handleDelete(cv._id || cv.cvId, e)}
+                                    title="Xóa CV này"
+                                >
+                                    <FontAwesomeIcon icon={faTrashCan} />
+                                </button>
                                 <img
                                     src={cv.previewUrl || getRandomPlaceholder()}
                                     alt="Preview CV"

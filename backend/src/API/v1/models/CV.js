@@ -15,15 +15,15 @@ const CVSchema = new mongoose.Schema(
       trim: true,
       maxlength: [100, "Tiêu đề không được quá 100 ký tự"],
     },
-    
+
     isDefault: {
       type: Boolean,
       default: false,
       index: true, // cực kỳ quan trọng để tìm CV mặc định nhanh
     },
-    
+
     // Thông tin chính
-    nameCV:String,
+    nameCV: String,
     jobPosition: String,
     careerField: String,
     careerGoal: String,
@@ -58,21 +58,50 @@ const CVSchema = new mongoose.Schema(
     ],
 
     // Kỹ năng
-    skills: [
-      {
-        name: { type: String, required: true, trim: true },
-        category: {
-          type: String,
-          enum: ["hard", "soft"],
-          default: "hard",
+    // skills: [
+    //   {
+    //     name: { type: String, required: true, trim: true },
+    //     category: {
+    //       type: String,
+    //       enum: ["hard", "soft"],
+    //       default: "hard",
+    //     },
+    //     level: {
+    //       type: String,
+    //       enum: ["beginner", "intermediate", "advanced", "expert"],
+    //       default: "intermediate",
+    //     },
+    //   },
+    // ],
+
+    skills: {
+      type: [
+        {
+          _id: false,
+          name: {
+            type: String,
+            required: true,
+            trim: true,
+          },
+          description: {
+            type: String,
+            trim: true,
+            default: "",
+          },
+          category: {
+            type: String,
+            enum: ["hard", "soft"],
+            default: "hard",
+          },
+          level: {
+            type: String,
+            enum: ["beginner", "intermediate", "advanced", "expert"],
+            default: "intermediate",
+          },
         },
-        level: {
-          type: String,
-          enum: ["beginner", "intermediate", "advanced", "expert"],
-          default: "intermediate",
-        },
-      },
-    ],
+      ],
+      default: [],
+    },
 
     certificates: [
       {
@@ -130,6 +159,15 @@ const CVSchema = new mongoose.Schema(
       type: String,
       default: "#1976d2",
       match: /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, // chỉ chấp nhận hex color
+    },
+    // xóa mềm 
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
     },
   },
   {

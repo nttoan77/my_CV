@@ -1,5 +1,3 @@
-
-
 // =========================================================
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -14,50 +12,82 @@ const cx = classNames.bind(styles);
 function ChooseCV() {
     const [cvList, setCvList] = useState([]);
     const [loading, setLoading] = useState(true);
-
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    navigate('/login');
-                    return;
-                }
-
-                const cvRes = await httpRequest.get('/api/auth/getCV');
-
-                const cvs = cvRes.data?.data; // 👈 CHỈ LẤY data
-                setCvList(Array.isArray(cvs) ? cvs : []);
-            } catch (err) {
-                console.error('Lỗi khi tải danh sách CV:', err);
-                if (err.response?.status === 401) {
-                    localStorage.clear();
-                    navigate('/login');
-                }
-            } finally {
-                setLoading(false);
+    // === CẢI TIẾN: Tách hàm fetch riêng để dễ reuse khi xóa CV ===
+    const fetchCVs = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/login');
+                return;
             }
-        };
 
-        fetchData();
+            // === SỬA: Thêm header Authorization (nếu httpRequest chưa tự xử lý)
+            const cvRes = await httpRequest.get('/api/cv', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const cvs = cvRes.data?.data || cvRes.data; // ← Linh hoạt hơn, phòng trường hợp API trả về data hoặc trực tiếp array
+            setCvList(Array.isArray(cvs) ? cvs : []);
+        } catch (err) {
+            console.error('Lỗi khi tải danh sách CV:', err);
+
+            if (err.response?.status === 401 || err.response?.status === 403) {
+                localStorage.removeItem('token'); // ← Chỉ clear token, không clear hết localStorage
+                navigate('/login');
+            }
+        }
+    };
+
+    useEffect(() => {
+        const loadData = async () => {
+            setLoading(true);
+            await fetchCVs();
+            setLoading(false);
+        };
+        loadData();
     }, [navigate]);
 
-    //   handle logic cv
+    // === THÊM MỚI: Hàm xử lý xóa CV + cập nhật lại danh sách ===
+    const handleDeleteCV = async (cvId) => {
+        if (!cvId) return;
+
+        try {
+            const token = localStorage.getItem('token');
+            await httpRequest.delete(`/api/cv/${cvId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            // Cập nhật state local (cách nhanh & mượt nhất)
+            setCvList((prev) => prev.filter((cv) => (cv._id || cv.cvId) !== cvId));
+
+            // Optional: Nếu muốn chắc chắn dữ liệu mới nhất từ server
+            // await fetchCVs();
+        } catch (err) {
+            console.error('Lỗi xóa CV:', err);
+            alert('Không thể xóa CV. Vui lòng thử lại!');
+            // Có thể thêm toast notification ở đây sau này
+        }
+    };
+
     const handleCreateNewCV = () => {
         navigate('/regis-Information-CV');
     };
 
-
     const handleSelectCV = (cvItem) => {
         if (!cvItem) return;
-      
-        const cvId = cvItem.cvId || cvItem._id;  // ← Lấy cvId trước, fallback _id
-      
+
+        const cvId = cvItem._id || cvItem.cvId; // ← Đảo thứ tự: ưu tiên _id (MongoDB thường dùng _id)
+        if (!cvId) return;
+
         localStorage.setItem('selectedCV', cvId);
         navigate(`/cv/${cvId}`);
-      };
+    };
 
     if (loading) {
         return (
@@ -71,12 +101,16 @@ function ChooseCV() {
     return (
         <div className={cx('container')}>
             <HeaderChooseCV className={cx('header-choose-cv')} />
-
             <div className={cx('main-content')}>
                 <h1 className={cx('title')}>Hồ sơ CV của bạn</h1>
 
-                {/* TOÀN BỘ PHẦN DANH SÁCH + EMPTY ĐÃ ĐƯỢC TÁCH RA ĐÂY */}
-                <CVList cvList={cvList} onCreateNew={handleCreateNewCV} onSelectCV={handleSelectCV} />
+                {/* === THÊM PROP onDeleteCV để truyền xuống CVList === */}
+                <CVList
+                    cvList={cvList}
+                    onCreateNew={handleCreateNewCV}
+                    onSelectCV={handleSelectCV}
+                    onDeleteCV={handleDeleteCV} // <--- ĐÂY LÀ PHẦN QUAN TRỌNG ĐỂ CHỨC NĂNG XÓA HOẠT ĐỘNG
+                />
             </div>
         </div>
     );

@@ -3,25 +3,30 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
+// ==================== GIỮ NGUYÊN ====================
 const cvUploadDir = path.join(process.cwd(), "public", "uploads", "cv");
 
-// ✅ OK: tạo folder nếu chưa có
+// Tạo folder nếu chưa có
 if (!fs.existsSync(cvUploadDir)) {
   fs.mkdirSync(cvUploadDir, { recursive: true });
 }
 
+// ==================== STORAGE ====================
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, cvUploadDir);
   },
+
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     const ext = path.extname(file.originalname);
 
-    // ✅ FIX: phân biệt file chứng chỉ
+    // ==================== 🔧 SỬA 1: prefix RÕ RÀNG ====================
     const prefix =
       file.fieldname === "certificateFiles"
         ? "certificate"
+        : file.fieldname === "attachments"
+        ? "attachment"
         : "cv";
 
     const filename = `${prefix}_${req.user._id}_${uniqueSuffix}${ext}`;
@@ -29,7 +34,11 @@ const storage = multer.diskStorage({
   },
 });
 
+// ==================== FILE FILTER ====================
 const fileFilter = (req, file, cb) => {
+  // 🔧 SỬA 2: log debug (test xong có thể xoá)
+  console.log("📦 UPLOAD FILE:", file.fieldname, file.originalname);
+
   const allowedTypes = [
     "image/jpeg",
     "image/jpg",
@@ -46,21 +55,21 @@ const fileFilter = (req, file, cb) => {
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Chỉ chấp nhận ảnh, PDF, Word, Excel"));
+    cb(new Error("❌ Chỉ chấp nhận ảnh, PDF, Word, Excel"), false);
   }
 };
 
-// ❗❗❗ FIX QUAN TRỌNG NHẤT Ở ĐÂY
+// ==================== 🔥 FIX QUAN TRỌNG NHẤT ====================
 export const uploadCVFiles = multer({
   storage,
   limits: {
-    fileSize: 20 * 1024 * 1024,
+    fileSize: 20 * 1024 * 1024, // 20MB
   },
   fileFilter,
 }).fields([
-  // ✅ FIX: FILE CHỨNG CHỈ
+  // 🔧 SỬA 3: GIỮ certificateFiles
   { name: "certificateFiles", maxCount: 20 },
 
-  // (nếu sau này có avatar, cover CV thì thêm tiếp)
-  // { name: "avatar", maxCount: 1 },
+  // 🔧 SỬA 4: THÊM attachments (TRƯỚC BẠN THIẾU)
+  { name: "attachments", maxCount: 10 },
 ]);

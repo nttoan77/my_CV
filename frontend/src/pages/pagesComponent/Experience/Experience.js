@@ -15,7 +15,7 @@ function Experience({ data }) {
     if (!data) return <div>Đang tải dữ liệu CV...</div>;
 
     // ✅ Lấy đúng workExperiences từ cvProfiles
-    const experiences = data.cvProfiles?.[0]?.workExperiences || [];
+    const experiences = Array.isArray(data) ? data : [];
 
     const handleSelect = (index) => {
         if (selectedIndex === index) {
@@ -66,14 +66,14 @@ function Experience({ data }) {
                                     </button>
 
                                     <div className={cx('detail-content')}>
-                                        <h4>{item.position}</h4>
+                                        {/* <h4>{item.position}</h4>
                                         <p className={cx('company')}>{item.company}</p>
                                         <p className={cx('time')}>
                                             {item.startDate} – {item.endDate || 'Hiện tại'}
-                                        </p>
+                                        </p> */}
 
                                         <div className={cx('desc-block')}>
-                                            <h5>Mô tả công việc</h5>
+                                            <h5>Mô tả</h5>
                                             <p>{item.description || 'Không có mô tả'}</p>
                                         </div>
 

@@ -5,116 +5,137 @@ import style from './regisSkillForm.module.scss';
 const cx = classNames.bind(style);
 
 function AddSkills({ value = [], onChange }) {
-    // ✅ State cục bộ giữ dữ liệu
-    const [skills, setSkills] = useState(value.length > 0 ? value : [{ type: 'hard', name: '', partials: [] }]);
+    const [skills, setSkills] = useState(
+        value.length > 0
+            ? value
+            : [
+                  {
+                      name: '',
+                      description: '',
+                      category: 'hard',
+                      level: 'intermediate',
+                  },
+              ]
+    );
 
-    // ✅ Đồng bộ khi prop value thay đổi từ cha
+    // 🔄 Đồng bộ từ component cha
     useEffect(() => {
         if (value && value.length > 0) {
             setSkills(value);
         }
     }, [value]);
 
-    // Hàm update chung
     const updateSkills = (newSkills) => {
         setSkills(newSkills);
         onChange && onChange(newSkills);
     };
 
-    // Cập nhật skill cha
-    const handleChange = (index, e) => {
-        const { name, value } = e.target;
+    const handleChange = (index, field, value) => {
         const newSkills = [...skills];
-        newSkills[index] = { ...newSkills[index], [name]: value };
+        newSkills[index] = {
+            ...newSkills[index],
+            [field]: value,
+        };
         updateSkills(newSkills);
     };
 
-    // Thêm skill cha
     const handleAdd = () => {
-        updateSkills([...skills, { type: 'hard', name: '', partials: [] }]);
+        updateSkills([
+            ...skills,
+            {
+                name: '',
+                description: '',
+                category: 'hard',
+                level: 'intermediate',
+            },
+        ]);
     };
 
-    // Thêm partial
-    const handleAddPartial = (index) => {
-        const newSkills = [...skills];
-        newSkills[index].partials.push({ name: '', level: '' });
-        updateSkills(newSkills);
-    };
-
-    // Sửa partial
-    const handleChangePartial = (skillIndex, partialIndex, field, value) => {
-        const newSkills = [...skills];
-        newSkills[skillIndex].partials[partialIndex][field] = value;
-        updateSkills(newSkills);
-    };
-
-    // Xóa skill cha
     const handleRemove = (index) => {
         updateSkills(skills.filter((_, i) => i !== index));
-    };
-
-    // Xóa partial
-    const handleRemovePartial = (skillIndex, partialIndex) => {
-        const newSkills = [...skills];
-        newSkills[skillIndex].partials = newSkills[skillIndex].partials.filter((_, i) => i !== partialIndex);
-        updateSkills(newSkills);
     };
 
     return (
         <div className={cx('form-container')}>
             <h3>Kỹ năng</h3>
+
             {skills.map((skill, index) => (
                 <div key={index} className={cx('form-item')}>
-                    <div className={cx('form-group')}>
-                        <label>Loại kỹ năng</label>
-                        <select name="type" value={skill.type} onChange={(e) => handleChange(index, e)}>
-                            <option value="hard">Kỹ năng cứng</option>
-                            <option value="soft">Kỹ năng mềm</option>
-                        </select>
-                    </div>
+                    {/* Tên kỹ năng */}
                     <div className={cx('form-group')}>
                         <label>Tên kỹ năng</label>
                         <input
                             type="text"
-                            name="name"
                             value={skill.name}
-                            onChange={(e) => handleChange(index, e)}
-                            placeholder="Nhập tên kỹ năng..."
+                            placeholder="VD: React, Node.js, Giao tiếp..."
+                            onChange={(e) =>
+                                handleChange(index, 'name', e.target.value)
+                            }
                         />
                     </div>
-                    {/* Partials */}
-                    <div className={cx('partials')}>
-                        <label>{skill.type === 'hard' ? 'Chi tiết kỹ năng cứng' : 'Chi tiết kỹ năng mềm'}</label>
-                        {skill.partials.map((p, i) => (
-                            <div key={i} className={cx('form-group-inline')}>
-                                <input
-                                    className={cx('partials-i')}
-                                    type="text"
-                                    value={p.name}
-                                    onChange={(e) => handleChangePartial(index, i, 'name', e.target.value)}
-                                    placeholder="Tên chi tiết..."
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => handleRemovePartial(index, i)}
-                                    className={cx('btn-remove-children')}
-                                >
-                                    ✕
-                                </button>
-                            </div>
-                        ))}
-                        <button type="button" onClick={() => handleAddPartial(index)} className={cx('btn-add')}>
-                            + Thêm chi tiết
-                        </button>
+
+                    {/* Mô tả kỹ năng */}
+                    <div className={cx('form-group')}>
+                        <label>Mô tả kỹ năng</label>
+                        <input
+                            rows={3}
+                            value={skill.description}
+                            placeholder="VD: Xây dựng SPA, làm việc với REST API, teamwork..."
+                            onChange={(e) =>
+                                handleChange(
+                                    index,
+                                    'description',
+                                    e.target.value
+                                )
+                            }
+                        />
                     </div>
-                    {/* Nút xóa kỹ năng cha */}
-                    {skills.length > 0 && (
-                        <button type="button" className={cx('btn-remove')} onClick={() => handleRemove(index)}>
-                            ✕
-                        </button>
-                    )}
+
+                    {/* Loại kỹ năng */}
+                    <div className={cx('form-group')}>
+                        <label>Loại kỹ năng</label>
+                        <select
+                            value={skill.category}
+                            onChange={(e) =>
+                                handleChange(
+                                    index,
+                                    'category',
+                                    e.target.value
+                                )
+                            }
+                        >
+                            <option value="hard">Kỹ năng cứng</option>
+                            <option value="soft">Kỹ năng mềm</option>
+                        </select>
+                    </div>
+
+                    {/* Trình độ */}
+                    {/* <div className={cx('form-group')}>
+                        <label>Trình độ</label>
+                        <select
+                            value={skill.level}
+                            onChange={(e) =>
+                                handleChange(index, 'level', e.target.value)
+                            }
+                        >
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                            <option value="expert">Expert</option>
+                        </select>
+                    </div> */}
+
+                    {/* Xóa kỹ năng */}
+                    <button
+                        type="button"
+                        className={cx('btn-remove')}
+                        onClick={() => handleRemove(index)}
+                    >
+                        ✕
+                    </button>
                 </div>
             ))}
+
             <button type="button" onClick={handleAdd} className={cx('btn-add')}>
                 + Thêm kỹ năng
             </button>
